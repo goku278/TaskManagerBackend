@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -544,5 +546,200 @@ class TaskServiceTest {
         Status status = (Status) response.getBody();
         assertNotNull(status);
         assertTrue(status.getMessage().contains("Internal Server Error"));
+    }
+
+    @Test
+    void testSortTasksByUserFirstName_Success() {
+        // Setup mock data
+        List<Long> userIds = List.of(1L, 2L);
+        List<Object[]> tasksData = new ArrayList<>();
+
+        Object[] task1 = {
+                1L,
+                Instant.now(),
+                "Task-1 Description",
+                "Pending",
+                "Task-1",
+                Instant.now(),
+                1L
+        };
+
+        Object[] task2 = {
+                2L,
+                Instant.now(),
+                "Task-2 Description",
+                "Completed",
+                "Task-2",
+                Instant.now(),
+                2L
+        };
+
+        tasksData.add(task1);
+        tasksData.add(task2);
+
+        when(usersRepository.sortByUserName()).thenReturn(userIds);
+        when(taskRepository.getTasksByIds(anyLong())).thenReturn(tasksData);
+
+        Users user1 = new Users();
+        user1.setUsersId(1L);
+        user1.setFirstName("Sourav");
+        user1.setLastName("Basu");
+        user1.setTimeZone("Asia/Calcutta");
+        user1.setIzactive("true");
+
+        Users user2 = new Users();
+        user2.setUsersId(2L);
+        user2.setFirstName("Aditya");
+        user2.setLastName("Karmakar");
+        user2.setTimeZone("Asia/Calcutta");
+        user2.setIzactive("true");
+
+        when(usersRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(usersRepository.findById(2L)).thenReturn(Optional.of(user2));
+
+        // Call the method
+        ResponseEntity<?> response = taskService.sortTasksByUserFirstName();
+
+        // Validate the response
+        assertEquals(200, ((Status) response.getBody()).getCode());
+//        assertEquals(2, ((Status) response.getBody()).getData().size());
+    }
+
+    @Test
+    void testSortTasksByUserFirstName_NoTasks() {
+        // Setup mock data
+        List<Long> userIds = List.of();
+        when(usersRepository.sortByUserName()).thenReturn(userIds);
+
+        // Call the method
+        ResponseEntity<?> response = taskService.sortTasksByUserFirstName();
+
+        // Validate the response
+        assertEquals(404, ((Status) response.getBody()).getCode());
+        assertEquals("Tasks not found", ((Status) response.getBody()).getMessage());
+    }
+
+    @Test
+    void testSortTasksByUserFirstName_Exception() {
+        // Setup mock to throw an exception
+        when(usersRepository.sortByUserName()).thenThrow(new RuntimeException("Database error"));
+
+        // Call the method
+        ResponseEntity<?> response = taskService.sortTasksByUserFirstName();
+
+        // Validate the response
+        assertEquals(500, ((Status) response.getBody()).getCode());
+        assertEquals("Internal Server Error", ((Status) response.getBody()).getMessage());
+    }
+
+    @Test
+    void testSortTasksByCreatedDate_Success() {
+        // Setup mock data
+        List<Object[]> tasksData = new ArrayList<>();
+
+        Object[] task1 = {
+                1L,
+                Instant.now(),
+                "Task-1 Description",
+                "Pending",
+                "Task-1",
+                Instant.now(),
+                1L
+        };
+
+        Object[] task2 = {
+                2L,
+                Instant.now(),
+                "Task-2 Description",
+                "Completed",
+                "Task-2",
+                Instant.now(),
+                2L
+        };
+
+        tasksData.add(task1);
+        tasksData.add(task2);
+
+        when(taskRepository.sortByCreatedDate()).thenReturn(tasksData);
+
+        Users user1 = new Users();
+        user1.setUsersId(1L);
+        user1.setFirstName("Sourav");
+        user1.setLastName("Basu");
+        user1.setTimeZone("Asia/Calcutta");
+        user1.setIzactive("true");
+
+        Users user2 = new Users();
+        user2.setUsersId(2L);
+        user2.setFirstName("Aditya");
+        user2.setLastName("Karmakar");
+        user2.setTimeZone("Asia/Calcutta");
+        user2.setIzactive("true");
+
+        when(usersRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(usersRepository.findById(2L)).thenReturn(Optional.of(user2));
+
+        // Call the method
+        ResponseEntity<?> response = taskService.sortTasksByCreatedDate();
+
+        // Validate the response
+        assertEquals(200, ((Status) response.getBody()).getCode());
+//        assertEquals(2, ((Status) response.getBody()).getData().size());
+    }
+
+    @Test
+    void testSortTasksByCreatedDate_NoTasks() {
+        // Setup mock data
+        List<Object[]> tasksData = new ArrayList<>();
+        when(taskRepository.sortByCreatedDate()).thenReturn(tasksData);
+
+        // Call the method
+        ResponseEntity<?> response = taskService.sortTasksByCreatedDate();
+
+        // Validate the response
+        assertEquals(404, ((Status) response.getBody()).getCode());
+        assertEquals("No Tasks Found", ((Status) response.getBody()).getMessage());
+    }
+
+    @Test
+    void testSortTasksByCreatedDate_Exception() {
+        // Setup mock to throw an exception
+        when(taskRepository.sortByCreatedDate()).thenThrow(new RuntimeException("Database error"));
+
+        // Call the method
+        ResponseEntity<?> response = taskService.sortTasksByCreatedDate();
+
+        // Validate the response
+        assertEquals(500, ((Status) response.getBody()).getCode());
+        assertEquals("Internal Server Error, with cause Database error", ((Status) response.getBody()).getMessage());
+    }
+
+    @Test
+    void testGetTasksByUserName_UserNotFound() {
+        // Setup mock data
+        String userName = "Sourav";
+        List<Long> userIds = List.of();
+
+        when(usersRepository.getAllUserIdWithUserName(userName)).thenReturn(userIds);
+
+        // Call the method
+        ResponseEntity<?> response = taskService.getTasksByUserName(userName);
+
+        // Validate the response
+        assertEquals(404, ((Status) response.getBody()).getCode());
+        assertEquals("User not found with user name " + userName, ((Status) response.getBody()).getMessage());
+    }
+
+    @Test
+    void testGetTasksByUserName_Exception() {
+        // Setup mock to throw an exception
+        when(usersRepository.getAllUserIdWithUserName(anyString())).thenThrow(new RuntimeException("Database error"));
+
+        // Call the method
+        ResponseEntity<?> response = taskService.getTasksByUserName("Sourav");
+
+        // Validate the response
+        assertEquals(500, ((Status) response.getBody()).getCode());
+        assertEquals("Internal Server Error, with cause  Database error", ((Status) response.getBody()).getMessage());
     }
 }

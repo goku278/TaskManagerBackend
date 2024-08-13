@@ -1,6 +1,5 @@
 package com.taskmanager.demo.service;
 
-import com.taskmanager.demo.db.Task;
 import com.taskmanager.demo.model.dto.Status;
 import com.taskmanager.demo.model.dto.Users;
 import com.taskmanager.demo.repo.TaskRepository;
@@ -9,7 +8,6 @@ import com.taskmanager.demo.util.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +20,7 @@ public class UsersService {
     TaskRepository taskRepository;
     @Autowired
     Converter converter;
+
     public ResponseEntity<?> addUser(Users users) {
         try {
             com.taskmanager.demo.db.Users user = converter.convert(users);
@@ -51,13 +50,12 @@ public class UsersService {
         try {
             List<com.taskmanager.demo.db.Users> users = usersRepository.findAll();
             List<com.taskmanager.demo.db.Users> users2 = new ArrayList<>();
-            int count = 1;
+            long count = 1;
             for (com.taskmanager.demo.db.Users users1 : users) {
-                if (count == toPageNo) break;
-                if (count == fromPageNo) {
+                if (count >= fromPageNo && count <= toPageNo) {
                     users2.add(users1);
+                    count++;
                 }
-                count++;
             }
             if (users2 == null || users2.isEmpty()) return ResponseEntity.ok(new Status("Users not found", 404));
             List<Users> usersList = new ArrayList<>();
@@ -82,5 +80,15 @@ public class UsersService {
         } catch (Exception e) {
             return ResponseEntity.ok(new Status("Error while adding user, cause of error is " + e.getMessage(), 500));
         }
+    }
+
+    public ResponseEntity<?> deleteUser(Long id) {
+        try {
+            usersRepository.deleteById(id);
+            return ResponseEntity.ok(new Status("User Deleted Successfully", 200));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new Status("Internal Server Error due to " + e.getMessage(), 500));
+        }
+
     }
 }

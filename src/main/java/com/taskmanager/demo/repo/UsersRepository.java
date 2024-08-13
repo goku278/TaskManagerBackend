@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface UsersRepository extends JpaRepository<Users, Long> {
-    @Query(value = "select users_id from Users where first_name like ?1", nativeQuery = true)
-    List<Long> getAllUserIdWithUserName(String userName);
+//    @Query(value = "select users_id from Users where first_name like ?1", nativeQuery = true)
+//    List<Long> getAllUserIdWithUserName(String userName);
+
+    @Query("SELECT u.usersId FROM Users u WHERE LOWER(u.firstName) LIKE LOWER(CONCAT('%', ?1, '%'))")
+    List<Long> getAllUserIdWithUserName(String firstName);
 
     @Query(value = "SELECT users_id FROM Users ORDER BY first_name ASC", nativeQuery = true)
     List<Long> sortByUserName();

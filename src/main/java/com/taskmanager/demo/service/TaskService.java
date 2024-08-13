@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -181,11 +181,14 @@ public class TaskService {
             for (Object[] task : tasks) {
                 Task task1 = new Task();
                 Long id = ((Number) task[0]).longValue();
-                ZonedDateTime createdAt = ((Timestamp) task[1]).toInstant().atZone(ZoneId.systemDefault());
+                Instant instant = (Instant) task[1];
+                ZonedDateTime createdAt = instant.atZone(ZoneId.systemDefault());
                 String description = (String) task[2];
                 String status = (String) task[3];
                 String title = (String) task[4];
-                ZonedDateTime updatedAt = ((Timestamp) task[5]).toInstant().atZone(ZoneId.systemDefault());
+                Instant instant2 = (Instant) task[5];
+                ZonedDateTime updatedAt = instant2.atZone(ZoneId.systemDefault());
+
                 Long userId = ((Number) task[6]).longValue();
 
                 System.out.println("Task ID: " + id);
@@ -234,11 +237,13 @@ public class TaskService {
                 for (Object[] task1 : task) {
                     Task task2 = new Task();
                     Long id2 = ((Number) task1[0]).longValue();
-                    ZonedDateTime createdAt = ((Timestamp) task1[1]).toInstant().atZone(ZoneId.systemDefault());
+                    Instant instant = (Instant) task1[1];
+                    ZonedDateTime createdAt = instant.atZone(ZoneId.systemDefault());
                     String description = (String) task1[2];
                     String status = (String) task1[3];
                     String title = (String) task1[4];
-                    ZonedDateTime updatedAt = ((Timestamp) task1[5]).toInstant().atZone(ZoneId.systemDefault());
+                    Instant instant2 = (Instant) task1[5];
+                    ZonedDateTime updatedAt = instant2.atZone(ZoneId.systemDefault());
                     Long userId = ((Number) task1[6]).longValue();
 
                     System.out.println("Task ID: " + id2);

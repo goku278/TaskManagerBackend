@@ -15,9 +15,9 @@ public class Users {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
-    ZoneId defaultZoneId = ZoneId.systemDefault();
+
     @Column(name = "time_zone")
-    private String timeZone = defaultZoneId.getId();
+    private String timeZone = ZoneId.systemDefault().getId();
     @Column(name = "is_active")
     private String izactive;
 
@@ -32,7 +32,7 @@ public class Users {
         this.usersId = usersId;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.defaultZoneId = defaultZoneId;
+//        this.defaultZoneId = defaultZoneId;
         this.timeZone = timeZone;
         this.izactive = izactive;
     }
@@ -61,14 +61,6 @@ public class Users {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public ZoneId getDefaultZoneId() {
-        return defaultZoneId;
-    }
-
-    public void setDefaultZoneId(ZoneId defaultZoneId) {
-        this.defaultZoneId = defaultZoneId;
     }
 
     public String getTimeZone() {
@@ -101,7 +93,6 @@ public class Users {
                 "usersId=" + usersId +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", defaultZoneId=" + defaultZoneId +
                 ", timeZone='" + timeZone + '\'' +
                 ", izactive='" + izactive + '\'' +
                 ", tasks=" + tasks +

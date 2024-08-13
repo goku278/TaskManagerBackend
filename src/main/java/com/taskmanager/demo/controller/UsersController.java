@@ -25,7 +25,7 @@ public class UsersController {
 
     // pagination
 
-    @GetMapping("api/getUsers/{fromPageNO}/{toPageNo}")
+    @GetMapping("api/getUsers/{fromPageNo}/{toPageNo}")
     public ResponseEntity<?> getUsers(@PathVariable Long fromPageNo, @PathVariable Long toPageNo) {
         return usersService.getUsers(fromPageNo, toPageNo);
     }
@@ -33,5 +33,10 @@ public class UsersController {
     @GetMapping("api/getUser/{id}")
     public ResponseEntity<?> getUser(@PathVariable Long id) {
         return usersService.getUser(id);
+    }
+
+    @DeleteMapping("api/deleteUser/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        return usersService.deleteUser(id);
     }
 }
